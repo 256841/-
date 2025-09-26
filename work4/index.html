@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>寻宝冒险游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: #f0e6d6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .game-container {
+            max-width: 800px;
+            width: 100%;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .game-header {
+            background-color: #8b4513;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .game-content {
+            padding: 20px;
+        }
+
+        .image-container {
+            width: 100%;
+            height: 400px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #eee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .game-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .text-container {
+            min-height: 80px;
+            padding: 15px;
+            background-color: #f8f5f0;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 18px;
+            line-height: 1.5;
+        }
+
+        .controls {
+            text-align: center;
+        }
+
+        .game-btn {
+            padding: 10px 20px;
+            background-color: #cd853f;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .game-btn:hover {
+            background-color: #8b4513;
+        }
+
+        .hint {
+            margin-top: 15px;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <h1>神秘宝藏探险</h1>
+        </div>
+        <div class="game-content">
+            <div class="image-container">
+                <img id="sceneImage" class="game-image" src="" alt="游戏场景">
+            </div>
+            <div id="gameText" class="text-container">
+                点击下方按钮开始你的寻宝之旅！
+            </div>
+            <div class="controls">
+                <button id="startBtn" class="game-btn">开始探险</button>
+                <p class="hint">提示：每张场景图片对应1-11.png，按剧情自动切换</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class TreasureMap {
+            // 图片路径映射表（请确保1.png到11.png与以下场景对应）
+            static imageMap = {
+                "在古老的图书馆里找到了第一个线索...": "1.png",
+                "解码成功!宝藏指向一座古老的神庙...": "3.png",
+                "没有线索可以解码!": "2.png",
+                "在神庙中发现了一张古老的地图，指向黑森林...": "5.png",
+                "糟糕!遇到了神庙守卫!": "4.png",
+                "在森林中迷路了，找不到方向!": "6.png",
+                "成功穿越黑森林，前面有一条湍急的河流...": "7.png",
+                "河流太湍急，无法渡过!": "7.png",  // 共用第7张照片
+                "找到一座古老的木桥，成功渡过河流，发现一个神秘洞穴...": "8.png",
+                "在洞穴深处发现了一个上锁的宝箱...": "10.png",
+                "洞穴内发生塌方，无法前进!": "9.png",
+                "恭喜!你找到了传说中的宝藏!里面装满了金银珠宝和古老的文物!": "11.png"
+            };
+
+            // 更新场景图片
+            static updateImage(text) {
+                const imgElement = document.getElementById('sceneImage');
+                imgElement.src = this.imageMap[text];  // 图片路径直接使用1.png-11.png
+                imgElement.alt = text;
+            }
+
+            static getInitialClue() {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        const result = "在古老的图书馆里找到了第一个线索...";
+                        this.updateImage(result);
+                        resolve(result);
+                    }, 1000);
+                });
+            }
+        
+            static decodeAncientScript(clue) {
+                return new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        if (!clue) {
+                            const error = "没有线索可以解码!";
+                            this.updateImage(error);
+                            reject(error);
+                        }
+                        const result = "解码成功!宝藏指向一座古老的神庙...";
+                        this.updateImage(result);
+                        resolve(result);
+                    }, 1500);
+                });
+            }
+        
+            static searchTemple(location) {
+                return new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        const random = Math.random();
+                        if (random < 0.3) {
+                            const error = "糟糕!遇到了神庙守卫!";
+                            this.updateImage(error);
+                            reject(error);
+                        }
+                        const result = "在神庙中发现了一张古老的地图，指向黑森林...";
+                        this.updateImage(result);
+                        resolve(result);
+                    }, 2000);
+                });
+            }
+
+            static crossForest() {
+                return new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        const random = Math.random();
+                        if (random < 0.25) {
+                            const error = "在森林中迷路了，找不到方向!";
+                            this.updateImage(error);
+                            reject(error);
+                        }
+                        const result = "成功穿越黑森林，前面有一条湍急的河流...";
+                        this.updateImage(result);
+                        resolve(result);
+                    }, 2500);
+                });
+            }
+
+            static crossRiver() {
+                return new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        const random = Math.random();
+                        if (random < 0.3) {
+                            const error = "河流太湍急，无法渡过!";
+                            this.updateImage(error);
+                            reject(error);
+                        }
+                        const result = "找到一座古老的木桥，成功渡过河流，发现一个神秘洞穴...";
+                        this.updateImage(result);
+                        resolve(result);
+                    }, 2000);
+                });
+            }
+
+            static exploreCave() {
+                return new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        const random = Math.random();
+                        if (random < 0.2) {
+                            const error = "洞穴内发生塌方，无法前进!";
+                            this.updateImage(error);
+                            reject(error);
+                        }
+                        const result = "在洞穴深处发现了一个上锁的宝箱...";
+                        this.updateImage(result);
+                        resolve(result);
+                    }, 1800);
+                });
+            }
+        
+            static openTreasureBox() {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        const result = "恭喜!你找到了传说中的宝藏!里面装满了金银珠宝和古老的文物!";
+                        this.updateImage(result);
+                        resolve(result);
+                    }, 1500);
+                });
+            }
+        }
+
+        // 游戏控制逻辑
+        document.getElementById('startBtn').addEventListener('click', () => {
+            const gameText = document.getElementById('gameText');
+            const startBtn = document.getElementById('startBtn');
+            
+            // 重置状态
+            startBtn.disabled = true;
+            startBtn.textContent = "探险进行中...";
+            gameText.textContent = "开始探险...";
+            document.getElementById('sceneImage').src = "";
+
+            // 完整寻宝流程
+            TreasureMap.getInitialClue()
+                .then(clue => {
+                    gameText.textContent = clue;
+                    return TreasureMap.decodeAncientScript(clue);
+                })
+                .then(location => {
+                    gameText.textContent = location;
+                    return TreasureMap.searchTemple(location);
+                })
+                .then(forestInfo => {
+                    gameText.textContent = forestInfo;
+                    return TreasureMap.crossForest();
+                })
+                .then(riverInfo => {
+                    gameText.textContent = riverInfo;
+                    return TreasureMap.crossRiver();
+                })
+                .then(caveInfo => {
+                    gameText.textContent = caveInfo;
+                    return TreasureMap.exploreCave();
+                })
+                .then(boxInfo => {
+                    gameText.textContent = boxInfo;
+                    return TreasureMap.openTreasureBox();
+                })
+                .then(treasure => {
+                    gameText.textContent = treasure;
+                    startBtn.textContent = "重新开始";
+                    startBtn.disabled = false;
+                })
+                .catch(error => {
+                    gameText.textContent = "任务失败: " + error;
+                    startBtn.textContent = "重新尝试";
+                    startBtn.disabled = false;
+                });
+        });
+    </script>
+</body>
+</html>
